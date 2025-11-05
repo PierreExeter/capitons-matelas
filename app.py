@@ -5,14 +5,13 @@ from io import StringIO
 app = Flask(__name__)
 
 
-def calculate_points(x, y, D):
+def calculate_points(x, y):
     """
     Calculate the positions of points on a 2D rectangle with corner-based pattern.
     
     Args:
         x: Width of rectangle in cm
         y: Height of rectangle in cm
-        D: Distance between points in cm (used as min_dist = 30)
     
     Returns:
         List of tuples containing (x_coord, y_coord) for each point
@@ -20,7 +19,8 @@ def calculate_points(x, y, D):
     import math
     
     points = []
-    min_dist = 30
+    min_dist_x = 30
+    min_dist_y = 40
     
     # Step 1: Place the 4 corner points
     corner1 = (15, 15)
@@ -30,7 +30,7 @@ def calculate_points(x, y, D):
     
     # Step 2: Calculate horizontal spacing
     dx_max = x - 30
-    nbx = math.floor(dx_max / min_dist)
+    nbx = math.floor(dx_max / min_dist_x)
     
     # Avoid division by zero
     if nbx == 0:
@@ -40,14 +40,13 @@ def calculate_points(x, y, D):
     
     # Step 5: Calculate vertical spacing
     dy_max = y - 30
-    nby = math.floor(dy_max / min_dist)
+    nby = math.floor(dy_max / min_dist_y)
     
     # Avoid division by zero
     if nby == 0:
         nby = 1
     
     dy = dy_max / nby
-    dy_spacing = dy * 2  # Multiply by 2 for distance between rows
     
     # Step 3: Place points on the first row (y = 15)
     points.append(corner1)  # (15, 15)
@@ -58,7 +57,7 @@ def calculate_points(x, y, D):
     points.append(corner2)  # (x-15, 15)
     
     # Step 6: Place points on intermediate rows
-    current_y = 15 + dy_spacing
+    current_y = 15 + dy
     while current_y < y - 15:
         # Add left corner point
         points.append((15, round(current_y, 2)))
@@ -72,7 +71,7 @@ def calculate_points(x, y, D):
         # Add right corner point
         points.append((x - 15, round(current_y, 2)))
         
-        current_y += dy_spacing
+        current_y += dy
     
     # Step 4: Place points on the last row (y = y-15)
     points.append(corner3)  # (15, y-15)
@@ -98,21 +97,16 @@ def calculate():
         data = request.get_json()
         x = float(data['x'])
         y = float(data['y'])
-        D = float(data['D'])
         
         # Validate inputs
-        if x <= 0 or y <= 0 or D <= 0:
+        if x <= 0 or y <= 0:
             return jsonify({'error': 'All dimensions must be positive'}), 400
         
-        if D > min(x, y):
-            return jsonify({'error': 'Distance D must be smaller than the shortest dimension'}), 400
-        
-        points = calculate_points(x, y, D)
+        points = calculate_points(x, y)
         
         return jsonify({
             'points': points,
-            'rectangle': {'x': x, 'y': y},
-            'd': min(x, y) / D
+            'rectangle': {'x': x, 'y': y}
         })
     
     except (KeyError, ValueError) as e:
@@ -126,9 +120,8 @@ def download_csv():
         data = request.get_json()
         x = float(data['x'])
         y = float(data['y'])
-        D = float(data['D'])
         
-        points = calculate_points(x, y, D)
+        points = calculate_points(x, y)
         
         # Create CSV in memory
         output = StringIO()

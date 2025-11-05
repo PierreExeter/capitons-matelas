@@ -228,7 +228,6 @@
                 <div class="info-box" id="infoBox" style="display: none;">
                     <h3>Results</h3>
                     <p><strong>Rectangle:</strong> <span id="rectDimensions"></span></p>
-                    <p><strong>Distance (d):</strong> <span id="calculatedD"></span></p>
                     <p><strong>Total Points:</strong> <span id="totalPoints"></span></p>
                 </div>
             </div>
@@ -256,9 +255,6 @@
         const errorMessage = document.getElementById('errorMessage');
         const infoBox = document.getElementById('infoBox');
 
-        // Hardcoded distance value
-        const D = 20;
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -271,7 +267,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ x, y, D }),
+                    body: JSON.stringify({ x, y}),
                 });
 
                 const data = await response.json();
@@ -282,7 +278,7 @@
                 }
 
                 hideError();
-                currentData = { x, y, D, ...data };
+                currentData = { x, y, ...data };
                 visualizePoints(data);
                 updateInfo(data);
                 downloadBtn.disabled = false;
@@ -304,8 +300,7 @@
                     },
                     body: JSON.stringify({
                         x: currentData.x,
-                        y: currentData.y,
-                        D: currentData.D
+                        y: currentData.y
                     }),
                 });
 
@@ -343,7 +338,7 @@
         });
 
         function visualizePoints(data) {
-            const { points, rectangle, d } = data;
+            const { points, rectangle} = data;
             const padding = 40;
             const canvasWidth = canvas.width;
             const canvasHeight = canvas.height;
@@ -423,8 +418,6 @@
         function updateInfo(data) {
             document.getElementById('rectDimensions').textContent = 
                 `${data.rectangle.x} cm × ${data.rectangle.y} cm`;
-            document.getElementById('calculatedD').textContent = 
-                `${data.d.toFixed(2)} cm`;
             document.getElementById('totalPoints').textContent = 
                 data.points.length;
             infoBox.style.display = 'block';
