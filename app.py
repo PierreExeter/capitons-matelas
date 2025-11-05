@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 def calculate_points(x, y, D):
     """
-    Calculate the positions of points on a 2D rectangle.
+    Calculate the positions of points on a 2D rectangle with staggered rows.
     
     Args:
         x: Width of rectangle in cm
@@ -24,10 +24,15 @@ def calculate_points(x, y, D):
     
     # Start from bottom-left at (d, d)
     y_pos = d
+    row_number = 1
     
     # Fill rows from bottom to top
     while y_pos <= y:
-        x_pos = d
+        # For even rows, offset the starting x position by 0.5*d
+        if row_number % 2 == 0:
+            x_pos = 1.5 * d  # Start at 1.5*d for even rows
+        else:
+            x_pos = d  # Start at d for odd rows
         
         # Fill columns from left to right
         while x_pos <= x:
@@ -35,6 +40,7 @@ def calculate_points(x, y, D):
             x_pos += d
         
         y_pos += d
+        row_number += 1
     
     return points
 
