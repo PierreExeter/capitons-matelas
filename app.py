@@ -48,7 +48,7 @@ def calculate_points(x, y):
     
     dy = dy_max / nby
     
-    # Step 3: Place points on the first row (y = 15)
+    # Step 3: Place points on the first row (y = 15) - EVEN ROW
     points.append(corner1)  # (15, 15)
     for i in range(1, nbx + 1):
         x_pos = 15 + i * dx
@@ -56,24 +56,35 @@ def calculate_points(x, y):
             points.append((round(x_pos, 2), 15))
     points.append(corner2)  # (x-15, 15)
     
-    # Step 6: Place points on intermediate rows
-    current_y = 15 + dy
-    while current_y < y - 15:
-        # Add left corner point
-        points.append((15, round(current_y, 2)))
-        
-        # Add intermediate points
-        for i in range(1, nbx + 1):
-            x_pos = 15 + i * dx
-            if x_pos < x - 15:
-                points.append((round(x_pos, 2), round(current_y, 2)))
-        
-        # Add right corner point
-        points.append((x - 15, round(current_y, 2)))
-        
-        current_y += dy
+    # Step 6: Place points on intermediate rows (alternating even and odd/staggered rows)
+    current_y = 15 + 0.5 * dy
+    row_counter = 0
     
-    # Step 4: Place points on the last row (y = y-15)
+    while current_y < y - 15:
+        is_odd_row = (row_counter % 2 == 0)  # First iteration is odd row (staggered)
+        
+        if is_odd_row:
+            # ODD ROW (staggered): Offset horizontally by 0.5*dx
+            # No corner points on staggered rows
+            for i in range(nbx + 1):
+                x_pos = 15 + (i + 0.5) * dx
+                if x_pos < x - 15:
+                    points.append((round(x_pos, 2), round(current_y, 2)))
+        else:
+            # EVEN ROW (regular): Include corner points
+            points.append((15, round(current_y, 2)))
+            
+            for i in range(1, nbx + 1):
+                x_pos = 15 + i * dx
+                if x_pos < x - 15:
+                    points.append((round(x_pos, 2), round(current_y, 2)))
+            
+            points.append((x - 15, round(current_y, 2)))
+        
+        current_y += 0.5 * dy
+        row_counter += 1
+    
+    # Step 4: Place points on the last row (y = y-15) - EVEN ROW
     points.append(corner3)  # (15, y-15)
     for i in range(1, nbx + 1):
         x_pos = 15 + i * dx
