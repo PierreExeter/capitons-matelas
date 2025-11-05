@@ -27,7 +27,7 @@ def calculate_points(x, y, D):
     row_number = 1
     
     # Fill rows from bottom to top
-    while y_pos <= y:
+    while y_pos <= y - d:
         # For even rows, offset the starting x position by 0.5*d
         if row_number % 2 == 0:
             x_pos = 1.5 * d  # Start at 1.5*d for even rows
@@ -35,7 +35,7 @@ def calculate_points(x, y, D):
             x_pos = d  # Start at d for odd rows
         
         # Fill columns from left to right
-        while x_pos <= x:
+        while x_pos <= x - d:
             points.append((round(x_pos, 2), round(y_pos, 2)))
             x_pos += d
         

@@ -127,6 +127,17 @@
             transform: none;
         }
 
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+
         .visualization-panel {
             background: #f8f9fa;
             padding: 25px;
@@ -207,13 +218,9 @@
                         <input type="number" id="y" step="0.01" min="0.01" required placeholder="e.g., 80">
                     </div>
 
-                    <div class="form-group">
-                        <label for="D">Distance Between Points (D) - cm:</label>
-                        <input type="number" id="D" step="0.01" min="0.01" required placeholder="e.g., 10">
-                    </div>
-
                     <div class="button-group">
                         <button type="submit" class="btn-primary">Calculate Points</button>
+                        <button type="button" id="clearBtn" class="btn-warning">Clear Visualization</button>
                         <button type="button" id="downloadBtn" class="btn-secondary" disabled>Download CSV</button>
                     </div>
                 </form>
@@ -245,15 +252,18 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
         const errorMessage = document.getElementById('errorMessage');
         const infoBox = document.getElementById('infoBox');
+
+        // Hardcoded distance value
+        const D = 20;
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const x = parseFloat(document.getElementById('x').value);
             const y = parseFloat(document.getElementById('y').value);
-            const D = parseFloat(document.getElementById('D').value);
 
             try {
                 const response = await fetch('/calculate', {
@@ -313,6 +323,23 @@
                 showError('An error occurred while downloading CSV');
                 console.error('Error:', error);
             }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Hide info box
+            infoBox.style.display = 'none';
+            
+            // Disable download button
+            downloadBtn.disabled = true;
+            
+            // Clear current data
+            currentData = null;
+            
+            // Hide any error messages
+            hideError();
         });
 
         function visualizePoints(data) {
