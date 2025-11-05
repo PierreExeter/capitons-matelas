@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rectangle Point Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-secondary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .visualization-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            min-height: 600px;
+        }
+
+        .canvas-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Rectangle Point Calculator</h1>
+            <p>Calculate and visualize point positions on a 2D rectangle</p>
+        </div>
+
+        <div class="content">
+            <div class="input-panel">
+                <h2 style="margin-bottom: 20px; color: #333;">Input Parameters</h2>
+                
+                <div class="error-message" id="errorMessage"></div>
+
+                <form id="calculatorForm">
+                    <div class="form-group">
+                        <label for="x">Rectangle Width (X) - cm:</label>
+                        <input type="number" id="x" step="0.01" min="0.01" required placeholder="e.g., 100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="y">Rectangle Height (Y) - cm:</label>
+                        <input type="number" id="y" step="0.01" min="0.01" required placeholder="e.g., 80">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="D">Distance Between Points (D) - cm:</label>
+                        <input type="number" id="D" step="0.01" min="0.01" required placeholder="e.g., 10">
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">Calculate Points</button>
+                        <button type="button" id="downloadBtn" class="btn-secondary" disabled>Download CSV</button>
+                    </div>
+                </form>
+
+                <div class="info-box" id="infoBox" style="display: none;">
+                    <h3>Results</h3>
+                    <p><strong>Rectangle:</strong> <span id="rectDimensions"></span></p>
+                    <p><strong>Distance (d):</strong> <span id="calculatedD"></span></p>
+                    <p><strong>Total Points:</strong> <span id="totalPoints"></span></p>
+                </div>
+            </div>
+
+            <div class="visualization-panel">
+                <h2 style="margin-bottom: 20px; color: #333;">Visualization</h2>
+                <div class="canvas-container">
+                    <canvas id="canvas" width="800" height="600"></canvas>
+                </div>
+                <p style="margin-top: 15px; text-align: center; color: #666;">
+                    Enter dimensions and click "Calculate Points" to see the visualization
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+
+        const form = document.getElementById('calculatorForm');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const infoBox = document.getElementById('infoBox');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const x = parseFloat(document.getElementById('x').value);
+            const y = parseFloat(document.getElementById('y').value);
+            const D = parseFloat(document.getElementById('D').value);
+
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ x, y, D }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(data.error);
+                    return;
+                }
+
+                hideError();
+                currentData = { x, y, D, ...data };
+                visualizePoints(data);
+                updateInfo(data);
+                downloadBtn.disabled = false;
+
+            } catch (error) {
+                showError('An error occurred while calculating points');
+                console.error('Error:', error);
+            }
+        });
+
+        downloadBtn.addEventListener('click', async () => {
+            if (!currentData) return;
+
+            try {
+                const response = await fetch('/download_csv', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        x: currentData.x,
+                        y: currentData.y,
+                        D: currentData.D
+                    }),
+                });
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'rectangle_points.csv';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } catch (error) {
+                showError('An error occurred while downloading CSV');
+                console.error('Error:', error);
+            }
+        });
+
+        function visualizePoints(data) {
+            const { points, rectangle, d } = data;
+            const padding = 40;
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+
+            // Calculate scale to fit rectangle in canvas
+            const availableWidth = canvasWidth - 2 * padding;
+            const availableHeight = canvasHeight - 2 * padding;
+            const scaleX = availableWidth / rectangle.x;
+            const scaleY = availableHeight / rectangle.y;
+            const scale = Math.min(scaleX, scaleY);
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            // Calculate rectangle dimensions on canvas
+            const rectWidth = rectangle.x * scale;
+            const rectHeight = rectangle.y * scale;
+
+            // Center the rectangle
+            const offsetX = (canvasWidth - rectWidth) / 2;
+            const offsetY = (canvasHeight - rectHeight) / 2;
+
+            // Draw rectangle
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(offsetX, offsetY, rectWidth, rectHeight);
+
+            // Draw origin label
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText('(0, 0)', offsetX - 5, offsetY + rectHeight + 15);
+
+            // Draw points
+            points.forEach(([px, py], index) => {
+                // Convert coordinates (origin at bottom-left)
+                const canvasX = offsetX + px * scale;
+                const canvasY = offsetY + rectHeight - py * scale;
+
+                // Draw point
+                ctx.fillStyle = '#667eea';
+                ctx.beginPath();
+                ctx.arc(canvasX, canvasY, 4, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw coordinate label
+                ctx.fillStyle = '#333';
+                ctx.font = '10px Arial';
+                const label = `(${px}, ${py})`;
+                const metrics = ctx.measureText(label);
+                
+                // Position label to avoid overlap
+                let labelX = canvasX + 8;
+                let labelY = canvasY - 8;
+                
+                // Adjust if too close to edges
+                if (labelX + metrics.width > canvasWidth - 10) {
+                    labelX = canvasX - metrics.width - 8;
+                }
+                if (labelY < 15) {
+                    labelY = canvasY + 15;
+                }
+                
+                ctx.fillText(label, labelX, labelY);
+            });
+
+            // Draw axis labels
+            ctx.fillStyle = '#666';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(`Width: ${rectangle.x} cm`, offsetX, offsetY - 10);
+            ctx.save();
+            ctx.translate(offsetX - 25, offsetY + rectHeight / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(`Height: ${rectangle.y} cm`, 0, 0);
+            ctx.restore();
+        }
+
+        function updateInfo(data) {
+            document.getElementById('rectDimensions').textContent = 
+                `${data.rectangle.x} cm × ${data.rectangle.y} cm`;
+            document.getElementById('calculatedD').textContent = 
+                `${data.d.toFixed(2)} cm`;
+            document.getElementById('totalPoints').textContent = 
+                data.points.length;
+            infoBox.style.display = 'block';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
