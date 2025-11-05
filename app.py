@@ -7,40 +7,80 @@ app = Flask(__name__)
 
 def calculate_points(x, y, D):
     """
-    Calculate the positions of points on a 2D rectangle with staggered rows.
+    Calculate the positions of points on a 2D rectangle with corner-based pattern.
     
     Args:
         x: Width of rectangle in cm
         y: Height of rectangle in cm
-        D: Distance between points in cm
+        D: Distance between points in cm (used as min_dist = 30)
     
     Returns:
         List of tuples containing (x_coord, y_coord) for each point
     """
-    # Calculate d as the shortest dimension divided by D
-    d = min(x, y) / D
+    import math
     
     points = []
+    min_dist = 30
     
-    # Start from bottom-left at (d, d)
-    y_pos = d
-    row_number = 1
+    # Step 1: Place the 4 corner points
+    corner1 = (15, 15)
+    corner2 = (x - 15, 15)
+    corner3 = (15, y - 15)
+    corner4 = (x - 15, y - 15)
     
-    # Fill rows from bottom to top
-    while y_pos <= y - d:
-        # For even rows, offset the starting x position by 0.5*d
-        if row_number % 2 == 0:
-            x_pos = 1.5 * d  # Start at 1.5*d for even rows
-        else:
-            x_pos = d  # Start at d for odd rows
+    # Step 2: Calculate horizontal spacing
+    dx_max = x - 30
+    nbx = math.floor(dx_max / min_dist)
+    
+    # Avoid division by zero
+    if nbx == 0:
+        nbx = 1
+    
+    dx = dx_max / nbx
+    
+    # Step 5: Calculate vertical spacing
+    dy_max = y - 30
+    nby = math.floor(dy_max / min_dist)
+    
+    # Avoid division by zero
+    if nby == 0:
+        nby = 1
+    
+    dy = dy_max / nby
+    dy_spacing = dy * 2  # Multiply by 2 for distance between rows
+    
+    # Step 3: Place points on the first row (y = 15)
+    points.append(corner1)  # (15, 15)
+    for i in range(1, nbx + 1):
+        x_pos = 15 + i * dx
+        if x_pos < x - 15:  # Don't duplicate corner2
+            points.append((round(x_pos, 2), 15))
+    points.append(corner2)  # (x-15, 15)
+    
+    # Step 6: Place points on intermediate rows
+    current_y = 15 + dy_spacing
+    while current_y < y - 15:
+        # Add left corner point
+        points.append((15, round(current_y, 2)))
         
-        # Fill columns from left to right
-        while x_pos <= x - d:
-            points.append((round(x_pos, 2), round(y_pos, 2)))
-            x_pos += d
+        # Add intermediate points
+        for i in range(1, nbx + 1):
+            x_pos = 15 + i * dx
+            if x_pos < x - 15:
+                points.append((round(x_pos, 2), round(current_y, 2)))
         
-        y_pos += d
-        row_number += 1
+        # Add right corner point
+        points.append((x - 15, round(current_y, 2)))
+        
+        current_y += dy_spacing
+    
+    # Step 4: Place points on the last row (y = y-15)
+    points.append(corner3)  # (15, y-15)
+    for i in range(1, nbx + 1):
+        x_pos = 15 + i * dx
+        if x_pos < x - 15:  # Don't duplicate corner4
+            points.append((round(x_pos, 2), round(y - 15, 2)))
+    points.append(corner4)  # (x-15, y-15)
     
     return points
 
