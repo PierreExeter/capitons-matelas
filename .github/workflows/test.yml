@@ -1,0 +1,137 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', 3.11]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-flask
+    
+    - name: Run tests with pytest
+      run: |
+        pytest --cov=app --cov-report=xml --cov-report=term-missing
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort
+        pip install -r requirements.txt
+    
+    - name: Lint with flake8
+      run: |
+        flake8 app.py --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check app.py
+        black --check tests/
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only app.py
+        isort --check-only tests/
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit
+        pip install -r requirements.txt
+    
+    - name: Run security scan with bandit
+      run: |
+        bandit -r app.py -f json -o bandit-report.json
+        bandit -r app.py
+
+  docker-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build Docker image
+      run: |
+        docker build -t matelas-calc-test .
+    
+    - name: Run Docker container
+      run: |
+        docker run -d -p 5000:5000 --name matelas-test matelas-calc-test
+        sleep 5
+    
+    - name: Test Docker container
+      run: |
+        curl -f http://localhost:5000/ || exit 1
+        curl -f -X POST -H "Content-Type: application/json" \
+          -d '{"x":220,"y":240,"min_dist_x":30,"min_dist_y":40,"edge_distance":15}' \
+          http://localhost:5000/calculate || exit 1
+    
+    - name: Clean up
+      run: |
+        docker stop matelas-test
+        docker rm matelas-test
