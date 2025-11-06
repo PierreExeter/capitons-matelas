@@ -1,0 +1,37 @@
+services:
+  # Development service with hot reload
+  matelas-calc-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matelas-calc-dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/matelas-env  # Exclude virtual environment
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    command: python -m flask run --host=0.0.0.0 --port=5000 --reload
+    restart: unless-stopped
+
+  # Production service
+  matelas-calc-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: matelas-calc-prod
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    restart: unless-stopped
+    profiles:
+      - prod
+
+# Development network
+networks:
+  default:
+    name: matelas-calc-network
