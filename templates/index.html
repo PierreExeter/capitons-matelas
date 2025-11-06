@@ -239,6 +239,11 @@
                         <input type="range" id="min_dist_y" min="1" max="100" value="40" step="1">
                     </div>
 
+                    <div class="form-group">
+                        <label for="edge_distance">Edge Distance: <span id="edge_distance_value">15</span> cm</label>
+                        <input type="range" id="edge_distance" min="1" max="50" value="15" step="1">
+                    </div>
+
                     <div class="button-group">
                         <button type="submit" class="btn-primary">Calculate Points</button>
                         <button type="button" id="toggleCoords" class="btn-info">Toggle Coordinates</button>
@@ -282,6 +287,8 @@
         const minDistYSlider = document.getElementById('min_dist_y');
         const minDistXValue = document.getElementById('min_dist_x_value');
         const minDistYValue = document.getElementById('min_dist_y_value');
+        const edgeDistanceSlider = document.getElementById('edge_distance');
+        const edgeDistanceValue = document.getElementById('edge_distance_value');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -290,6 +297,7 @@
             const y = parseFloat(document.getElementById('y').value);
             const min_dist_x = parseFloat(minDistXSlider.value);
             const min_dist_y = parseFloat(minDistYSlider.value);
+            const edge_distance = parseFloat(edgeDistanceSlider.value);
 
             try {
                 const response = await fetch('/calculate', {
@@ -297,7 +305,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ x, y, min_dist_x, min_dist_y }),
+                    body: JSON.stringify({ x, y, min_dist_x, min_dist_y, edge_distance }),
                 });
 
                 const data = await response.json();
@@ -332,7 +340,8 @@
                     x: currentData.x,
                     y: currentData.y,
                     min_dist_x: minDistXSlider.value,
-                    min_dist_y: minDistYSlider.value
+                    min_dist_y: minDistYSlider.value,
+                    edge_distance: edgeDistanceSlider.value
                 }),
                 });
 
@@ -474,6 +483,10 @@
 
         minDistYSlider.addEventListener('input', () => {
             minDistYValue.textContent = minDistYSlider.value;
+        });
+
+        edgeDistanceSlider.addEventListener('input', () => {
+            edgeDistanceValue.textContent = edgeDistanceSlider.value;
         });
 
         function showError(message) {
