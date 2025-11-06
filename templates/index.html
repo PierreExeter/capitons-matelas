@@ -245,15 +245,13 @@
 
                     <div class="button-group">
                         <button type="submit" class="btn-primary">Calculer les points</button>
-                        <button type="button" id="toggleCoords" class="btn-info">Afficher/Masquer les coordonnées</button>
+                        <button type="button" id="toggleCoords" class="btn-info">Masquer les coordonnées</button>
                         <button type="button" id="clearBtn" class="btn-warning">Effacer tout</button>
                     </div>
                 </form>
 
                 <div class="info-box" id="infoBox" style="display: none;">
-                    <h3>Résultats</h3>
-                    <p><strong>Rectangle:</strong> <span id="rectDimensions"></span></p>
-                    <p><strong>Total des Points:</strong> <span id="totalPoints"></span></p>
+                    <p><strong>Total des points:</strong> <span id="totalPoints"></span></p>
                 </div>
             </div>
 
@@ -420,17 +418,15 @@
             // Draw axis labels
             ctx.fillStyle = '#666';
             ctx.font = 'bold 14px Arial';
-            ctx.fillText(`Width: ${rectangle.x} cm`, offsetX, offsetY - 10);
+            ctx.fillText(`Largeur: ${rectangle.x} cm`, offsetX, offsetY - 10);
             ctx.save();
             ctx.translate(offsetX - 25, offsetY + rectHeight / 2);
             ctx.rotate(-Math.PI / 2);
-            ctx.fillText(`Height: ${rectangle.y} cm`, 0, 0);
+            ctx.fillText(`Hauteur: ${rectangle.y} cm`, 0, 0);
             ctx.restore();
         }
 
         function updateInfo(data) {
-            document.getElementById('rectDimensions').textContent = 
-                `${data.rectangle.x} cm × ${data.rectangle.y} cm`;
             document.getElementById('totalPoints').textContent = 
                 data.points.length;
             infoBox.style.display = 'block';
