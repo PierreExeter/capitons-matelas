@@ -1,7 +1,5 @@
-from flask import Flask, render_template, request, jsonify, make_response
-import csv
+from flask import Flask, render_template, request, jsonify
 import math
-from io import StringIO
 
 app = Flask(__name__)
 
@@ -129,40 +127,6 @@ def calculate():
     except (KeyError, ValueError) as e:
         return jsonify({'error': 'Invalid input data'}), 400
 
-
-@app.route('/download_csv', methods=['POST'])
-def download_csv():
-    """Generate and download CSV file with point coordinates"""
-    try:
-        data = request.get_json()
-        x = float(data['x'])
-        y = float(data['y'])
-        min_dist_x = float(data.get('min_dist_x', 30))
-        min_dist_y = float(data.get('min_dist_y', 40))
-        edge_distance = float(data.get('edge_distance', 15))
-        
-        points = calculate_points(x, y, min_dist_x, min_dist_y, edge_distance)
-        
-        # Create CSV in memory
-        output = StringIO()
-        writer = csv.writer(output)
-        
-        # Write header
-        writer.writerow(['Point #', 'X (cm)', 'Y (cm)'])
-        
-        # Write points
-        for i, (px, py) in enumerate(points, start=1):
-            writer.writerow([i, px, py])
-        
-        # Create response
-        response = make_response(output.getvalue())
-        response.headers['Content-Type'] = 'text/csv'
-        response.headers['Content-Disposition'] = 'attachment; filename=rectangle_points.csv'
-        
-        return response
-    
-    except (KeyError, ValueError) as e:
-        return jsonify({'error': 'Invalid input data'}), 400
 
 
 if __name__ == '__main__':

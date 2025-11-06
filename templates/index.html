@@ -247,7 +247,6 @@
                         <button type="submit" class="btn-primary">Calculer les points</button>
                         <button type="button" id="toggleCoords" class="btn-info">Afficher/Masquer les coordonnées</button>
                         <button type="button" id="clearBtn" class="btn-warning">Effacer tout</button>
-                        <button type="button" id="downloadBtn" class="btn-secondary" disabled>Télécharger CSV</button>
                     </div>
                 </form>
 
@@ -277,7 +276,6 @@
         const form = document.getElementById('calculatorForm');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const downloadBtn = document.getElementById('downloadBtn');
         const clearBtn = document.getElementById('clearBtn');
         const toggleCoords = document.getElementById('toggleCoords');
         const errorMessage = document.getElementById('errorMessage');
@@ -318,7 +316,6 @@
                 currentData = { x, y, ...data };
                 visualizePoints(data);
                 updateInfo(data);
-                downloadBtn.disabled = false;
 
             } catch (error) {
                 showError('Une erreur est survenue lors du calcul des points');
@@ -326,39 +323,6 @@
             }
         });
 
-        downloadBtn.addEventListener('click', async () => {
-            if (!currentData) return;
-
-            try {
-                const response = await fetch('/download_csv', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                body: JSON.stringify({
-                    x: currentData.x,
-                    y: currentData.y,
-                    min_dist_x: minDistXSlider.value,
-                    min_dist_y: minDistYSlider.value,
-                    edge_distance: edgeDistanceSlider.value
-                }),
-                });
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'rectangle_points.csv';
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-
-            } catch (error) {
-                showError('Une erreur est survenue lors du téléchargement du CSV');
-                console.error('Error:', error);
-            }
-        });
 
         clearBtn.addEventListener('click', () => {
             // Clear canvas
@@ -366,9 +330,6 @@
             
             // Hide info box
             infoBox.style.display = 'none';
-            
-            // Disable download button
-            downloadBtn.disabled = true;
             
             // Clear current data
             currentData = null;
