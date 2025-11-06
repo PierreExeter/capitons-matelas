@@ -254,7 +254,6 @@
                     </div>
 
                     <div class="button-group">
-                        <button type="submit" class="btn-primary">Calculer les points</button>
                         <button type="button" id="toggleCoords" class="btn-info">Masquer les coordonnées</button>
                         <button type="button" id="clearBtn" class="btn-warning">Effacer tout</button>
                     </div>
@@ -271,7 +270,7 @@
                     <canvas id="canvas" width="800" height="600"></canvas>
                 </div>
                 <p style="margin-top: 15px; text-align: center; color: #666;">
-                    Entrez les dimensions et cliquez sur "Calculer les points" pour voir la visualisation
+                    Ajustez les paramètres pour voir la visualisation en temps réel
                 </p>
             </div>
         </div>
@@ -563,17 +562,47 @@
             infoBox.style.display = 'block';
         }
 
-        // Add event listeners for sliders
-        minDistXSlider.addEventListener('input', () => {
-            minDistXValue.textContent = minDistXSlider.value;
-        });
+        // Auto-calculate on page load with default values
+        function updateVisualization() {
+            const x = parseFloat(document.getElementById('x').value);
+            const y = parseFloat(document.getElementById('y').value);
+            const min_dist_x = parseFloat(minDistXSlider.value);
+            const min_dist_y = parseFloat(minDistYSlider.value);
+            const edge_distance = parseFloat(edgeDistanceSlider.value);
+            
+            // Show loading state
+            errorMessage.style.display = 'none';
+            
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ x, y, min_dist_x, min_dist_y, edge_distance }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideError();
+                currentData = { x, y, ...data };
+                visualizePoints(data);
+                updateInfo(data);
+            })
+            .catch(error => {
+                showError('Une erreur est survenue lors du calcul des points');
+                console.error('Error:', error);
+            });
+        }
 
-        minDistYSlider.addEventListener('input', () => {
-            minDistYValue.textContent = minDistYSlider.value;
-        });
+        // Add event listeners for real-time updates
+        document.getElementById('x').addEventListener('input', updateVisualization);
+        document.getElementById('y').addEventListener('input', updateVisualization);
+        minDistXSlider.addEventListener('input', updateVisualization);
+        minDistYSlider.addEventListener('input', updateVisualization);
+        edgeDistanceSlider.addEventListener('input', updateVisualization);
 
-        edgeDistanceSlider.addEventListener('input', () => {
-            edgeDistanceValue.textContent = edgeDistanceSlider.value;
+        // Initial calculation on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateVisualization();
         });
 
         function showError(message) {
