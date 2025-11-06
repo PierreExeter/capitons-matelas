@@ -1,6 +1,6 @@
-# Vercel Deployment Guide - Waitress Setup
+# Vercel Deployment Guide - Single File Setup
 
-This guide explains how to deploy the mattress button point calculator on Vercel using Waitress as the production server.
+This guide explains how to deploy the mattress button point calculator on Vercel using a single unified file approach.
 
 ## 🚀 Quick Deploy
 
@@ -20,9 +20,9 @@ vercel --prod
 ## 📁 Project Structure
 
 ```
-├── server.py              # Main Flask app with Waitress
+├── app.py                  # Single unified Flask application
 ├── templates/
-│   └── index.html         # Frontend template
+│   └── index.html          # Frontend template
 ├── vercel.json             # Vercel configuration
 └── requirements.txt          # Python dependencies
 ```
@@ -30,15 +30,16 @@ vercel --prod
 ## 🔧 Configuration
 
 ### vercel.json
-- Routes all requests to `server.py`
+- Routes all requests to `app.py`
 - Configures Python 3.9 runtime
 - Simple catch-all routing
 
-### server.py
-- **Flask app** with production-ready routes
-- **Waitress server** for production deployment
+### app.py
+- **Flask app** with all routes and logic
+- **Smart server detection** for different environments
 - **All endpoints**: /, /calculate, /health
 - **Same calculation logic** as original app
+- **No external dependencies** for basic operation
 
 ## 🧪 Local Testing
 
@@ -57,13 +58,22 @@ curl -X POST http://localhost:3000/calculate \
   -d '{"x":220,"y":240,"min_dist_x":30,"min_dist_y":40,"edge_distance":15}'
 ```
 
-### Test Production Server Locally
+### Test Production Server Locally with Waitress
 ```bash
-# Run with Waitress (production mode)
-python server.py
+# Run with Waitress (optional, requires waitress installation)
+USE_WAITRESS=true python app.py
 
 # Test on port 8000
 curl http://localhost:8000/health
+```
+
+### Test Development Server Locally
+```bash
+# Run development server
+python app.py
+
+# Test on port 5000
+curl http://localhost:5000/health
 ```
 
 ## 🌐 Production Features

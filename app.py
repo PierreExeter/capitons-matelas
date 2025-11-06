@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import math
+import os
 
 app = Flask(__name__)
 
@@ -128,6 +129,33 @@ def calculate():
         return jsonify({'error': 'Invalid input data'}), 400
 
 
+@app.route('/health')
+def health():
+    """Health check endpoint for production monitoring"""
+    return jsonify({
+        'status': 'healthy',
+        'service': 'matelas-calc',
+        'environment': os.getenv('VERCEL_ENV', 'development'),
+        'version': '1.0.0'
+    }), 200
 
+
+# Smart server handling for different environments
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Development mode: Flask development server
+    print("🚀 Running in development mode on http://localhost:5000")
+    app.run(debug=True, host='0.0.0.0', port=5000)
+else:
+    # Production mode for Vercel or other serverless platforms
+    # Vercel automatically handles the app instance, no server needed
+    
+    # Optional: For local production testing with Waitress
+    if os.getenv('USE_WAITRESS', 'false').lower() == 'true':
+        try:
+            from waitress import serve
+            print("🚀 Running in production mode with Waitress on http://localhost:8000")
+            serve(app, host='0.0.0.0', port=8000)
+        except ImportError:
+            print("⚠️  Waitress not installed. Install with: pip install waitress")
+            print("🚀 Falling back to Flask development server")
+            app.run(host='0.0.0.0', port=5000)
