@@ -596,9 +596,21 @@
         // Add event listeners for real-time updates
         document.getElementById('x').addEventListener('input', updateVisualization);
         document.getElementById('y').addEventListener('input', updateVisualization);
-        minDistXSlider.addEventListener('input', updateVisualization);
-        minDistYSlider.addEventListener('input', updateVisualization);
-        edgeDistanceSlider.addEventListener('input', updateVisualization);
+        
+        minDistXSlider.addEventListener('input', () => {
+            minDistXValue.textContent = minDistXSlider.value;
+            updateVisualization();
+        });
+        
+        minDistYSlider.addEventListener('input', () => {
+            minDistYValue.textContent = minDistYSlider.value;
+            updateVisualization();
+        });
+        
+        edgeDistanceSlider.addEventListener('input', () => {
+            edgeDistanceValue.textContent = edgeDistanceSlider.value;
+            updateVisualization();
+        });
 
         // Initial calculation on page load
         window.addEventListener('DOMContentLoaded', () => {

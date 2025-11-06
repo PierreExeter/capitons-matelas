@@ -1,4 +1,4 @@
-# Matelas Calculator - Button Point Visualization
+# Quilting Point Calculator and Visualization for Mattresses
 
 A Flask web application that calculates and visualizes optimal button/tufting points on mattresses with real-time interactive controls.
 
