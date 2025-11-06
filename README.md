@@ -2,6 +2,8 @@
 
 A Flask web application that calculates and visualizes optimal button/tufting points on mattresses with real-time interactive controls.
 
+![screenshot_app](img/screenshot_app.png)
+
 ## 🎯 Overview
 
 This application helps determine the best placement of button points on rectangular mattresses, providing:
@@ -66,7 +68,7 @@ This application helps determine the best placement of button points on rectangu
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/matelas-calc.git
+git clone https://github.com/PierreExeter/capitons-matelas.git
 cd matelas-calc
 
 # Create virtual environment
@@ -330,16 +332,5 @@ Enable browser developer tools to monitor:
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [GPL-3.0 license](LICENSE).
 
-## 📞 Support
-
-For questions, issues, or contributions:
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/matelas-calc/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/matelas-calc/discussions)
-- **Email**: your.email@example.com
-
----
-
-**Built with ❤️ for mattress manufacturers and designers**
