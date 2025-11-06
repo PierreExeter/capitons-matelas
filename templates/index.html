@@ -138,6 +138,17 @@
             box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
 
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.4);
+        }
+
         .visualization-panel {
             background: #f8f9fa;
             padding: 25px;
@@ -220,6 +231,7 @@
 
                     <div class="button-group">
                         <button type="submit" class="btn-primary">Calculate Points</button>
+                        <button type="button" id="toggleCoords" class="btn-info">Toggle Coordinates</button>
                         <button type="button" id="clearBtn" class="btn-warning">Clear Visualization</button>
                         <button type="button" id="downloadBtn" class="btn-secondary" disabled>Download CSV</button>
                     </div>
@@ -246,12 +258,14 @@
 
     <script>
         let currentData = null;
+        let showCoordinates = true;
 
         const form = document.getElementById('calculatorForm');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
         const clearBtn = document.getElementById('clearBtn');
+        const toggleCoords = document.getElementById('toggleCoords');
         const errorMessage = document.getElementById('errorMessage');
         const infoBox = document.getElementById('infoBox');
 
@@ -321,7 +335,7 @@
         });
 
         clearBtn.addEventListener('click', () => {
-            // Clear the canvas
+            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Hide info box
@@ -335,6 +349,16 @@
             
             // Hide any error messages
             hideError();
+        });
+
+        toggleCoords.addEventListener('click', () => {
+            showCoordinates = !showCoordinates;
+            toggleCoords.textContent = showCoordinates ? 'Hide Coordinates' : 'Show Coordinates';
+            
+            // Re-visualize if data exists
+            if (currentData) {
+                visualizePoints(currentData);
+            }
         });
 
         function visualizePoints(data) {
@@ -383,25 +407,27 @@
                 ctx.arc(canvasX, canvasY, 4, 0, 2 * Math.PI);
                 ctx.fill();
 
-                // Draw coordinate label
-                ctx.fillStyle = '#333';
-                ctx.font = '10px Arial';
-                const label = `(${px}, ${py})`;
-                const metrics = ctx.measureText(label);
-                
-                // Position label to avoid overlap
-                let labelX = canvasX + 8;
-                let labelY = canvasY - 8;
-                
-                // Adjust if too close to edges
-                if (labelX + metrics.width > canvasWidth - 10) {
-                    labelX = canvasX - metrics.width - 8;
+                // Draw coordinate label (only if showCoordinates is true)
+                if (showCoordinates) {
+                    ctx.fillStyle = '#333';
+                    ctx.font = '10px Arial';
+                    const label = `(${px}, ${py})`;
+                    const metrics = ctx.measureText(label);
+                    
+                    // Position label to avoid overlap
+                    let labelX = canvasX + 8;
+                    let labelY = canvasY - 8;
+                    
+                    // Adjust if too close to edges
+                    if (labelX + metrics.width > canvasWidth - 10) {
+                        labelX = canvasX - metrics.width - 8;
+                    }
+                    if (labelY < 15) {
+                        labelY = canvasY + 15;
+                    }
+                    
+                    ctx.fillText(label, labelX, labelY);
                 }
-                if (labelY < 15) {
-                    labelY = canvasY + 15;
-                }
-                
-                ctx.fillText(label, labelX, labelY);
             });
 
             // Draw axis labels
