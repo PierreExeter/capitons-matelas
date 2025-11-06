@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rectangle Point Calculator</title>
+    <title>Calculateur de points de capitons sur matelas</title>
     <style>
         * {
             margin: 0;
@@ -208,64 +208,63 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Rectangle Point Calculator</h1>
-            <p>Calculate and visualize point positions on a 2D rectangle</p>
+            <h1>Calculateur de points de capitons sur matelas</h1>
         </div>
 
         <div class="content">
             <div class="input-panel">
-                <h2 style="margin-bottom: 20px; color: #333;">Input Parameters</h2>
+                <h2 style="margin-bottom: 20px; color: #333;">Paramètres</h2>
                 
                 <div class="error-message" id="errorMessage"></div>
 
                 <form id="calculatorForm">
                     <div class="form-group">
-                        <label for="x">Rectangle Width (X) - cm:</label>
-                        <input type="number" id="x" step="0.01" min="0.01" required placeholder="e.g., 100">
+                        <label for="x">Largeur du matelas (X) - cm:</label>
+                        <input type="number" id="x" step="0.01" min="0.01" required placeholder="ex: 220">
                     </div>
 
                     <div class="form-group">
-                        <label for="y">Rectangle Height (Y) - cm:</label>
-                        <input type="number" id="y" step="0.01" min="0.01" required placeholder="e.g., 80">
+                        <label for="y">Hauteur du matelas (Y) - cm:</label>
+                        <input type="number" id="y" step="0.01" min="0.01" required placeholder="ex: 240">
                     </div>
 
                     <div class="form-group">
-                        <label for="min_dist_x">Min Distance X: <span id="min_dist_x_value">30</span> cm</label>
+                        <label for="min_dist_x">Distance min entre points X: <span id="min_dist_x_value">30</span> cm</label>
                         <input type="range" id="min_dist_x" min="1" max="100" value="30" step="1">
                     </div>
 
                     <div class="form-group">
-                        <label for="min_dist_y">Min Distance Y: <span id="min_dist_y_value">40</span> cm</label>
+                        <label for="min_dist_y">Distance min entre points Y: <span id="min_dist_y_value">40</span> cm</label>
                         <input type="range" id="min_dist_y" min="1" max="100" value="40" step="1">
                     </div>
 
                     <div class="form-group">
-                        <label for="edge_distance">Edge Distance: <span id="edge_distance_value">15</span> cm</label>
+                        <label for="edge_distance">Distance des bords: <span id="edge_distance_value">15</span> cm</label>
                         <input type="range" id="edge_distance" min="1" max="50" value="15" step="1">
                     </div>
 
                     <div class="button-group">
-                        <button type="submit" class="btn-primary">Calculate Points</button>
-                        <button type="button" id="toggleCoords" class="btn-info">Toggle Coordinates</button>
-                        <button type="button" id="clearBtn" class="btn-warning">Clear Visualization</button>
-                        <button type="button" id="downloadBtn" class="btn-secondary" disabled>Download CSV</button>
+                        <button type="submit" class="btn-primary">Calculer les points</button>
+                        <button type="button" id="toggleCoords" class="btn-info">Afficher/Masquer les coordonnées</button>
+                        <button type="button" id="clearBtn" class="btn-warning">Effacer tout</button>
+                        <button type="button" id="downloadBtn" class="btn-secondary" disabled>Télécharger CSV</button>
                     </div>
                 </form>
 
                 <div class="info-box" id="infoBox" style="display: none;">
-                    <h3>Results</h3>
+                    <h3>Résultats</h3>
                     <p><strong>Rectangle:</strong> <span id="rectDimensions"></span></p>
-                    <p><strong>Total Points:</strong> <span id="totalPoints"></span></p>
+                    <p><strong>Total des Points:</strong> <span id="totalPoints"></span></p>
                 </div>
             </div>
 
             <div class="visualization-panel">
-                <h2 style="margin-bottom: 20px; color: #333;">Visualization</h2>
+                <h2 style="margin-bottom: 20px; color: #333;">Visualisation</h2>
                 <div class="canvas-container">
                     <canvas id="canvas" width="800" height="600"></canvas>
                 </div>
                 <p style="margin-top: 15px; text-align: center; color: #666;">
-                    Enter dimensions and click "Calculate Points" to see the visualization
+                    Entrez les dimensions et cliquez sur "Calculer les points" pour voir la visualisation
                 </p>
             </div>
         </div>
@@ -322,7 +321,7 @@
                 downloadBtn.disabled = false;
 
             } catch (error) {
-                showError('An error occurred while calculating points');
+                showError('Une erreur est survenue lors du calcul des points');
                 console.error('Error:', error);
             }
         });
@@ -356,7 +355,7 @@
                 document.body.removeChild(a);
 
             } catch (error) {
-                showError('An error occurred while downloading CSV');
+                showError('Une erreur est survenue lors du téléchargement du CSV');
                 console.error('Error:', error);
             }
         });
@@ -380,7 +379,7 @@
 
         toggleCoords.addEventListener('click', () => {
             showCoordinates = !showCoordinates;
-            toggleCoords.textContent = showCoordinates ? 'Hide Coordinates' : 'Show Coordinates';
+            toggleCoords.textContent = showCoordinates ? 'Masquer les coordonnées' : 'Afficher les coordonnées';
             
             // Re-visualize if data exists
             if (currentData) {
