@@ -229,6 +229,16 @@
                         <input type="number" id="y" step="0.01" min="0.01" required placeholder="e.g., 80">
                     </div>
 
+                    <div class="form-group">
+                        <label for="min_dist_x">Min Distance X: <span id="min_dist_x_value">30</span> cm</label>
+                        <input type="range" id="min_dist_x" min="1" max="100" value="30" step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min_dist_y">Min Distance Y: <span id="min_dist_y_value">40</span> cm</label>
+                        <input type="range" id="min_dist_y" min="1" max="100" value="40" step="1">
+                    </div>
+
                     <div class="button-group">
                         <button type="submit" class="btn-primary">Calculate Points</button>
                         <button type="button" id="toggleCoords" class="btn-info">Toggle Coordinates</button>
@@ -268,12 +278,18 @@
         const toggleCoords = document.getElementById('toggleCoords');
         const errorMessage = document.getElementById('errorMessage');
         const infoBox = document.getElementById('infoBox');
+        const minDistXSlider = document.getElementById('min_dist_x');
+        const minDistYSlider = document.getElementById('min_dist_y');
+        const minDistXValue = document.getElementById('min_dist_x_value');
+        const minDistYValue = document.getElementById('min_dist_y_value');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const x = parseFloat(document.getElementById('x').value);
             const y = parseFloat(document.getElementById('y').value);
+            const min_dist_x = parseFloat(minDistXSlider.value);
+            const min_dist_y = parseFloat(minDistYSlider.value);
 
             try {
                 const response = await fetch('/calculate', {
@@ -281,7 +297,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ x, y}),
+                    body: JSON.stringify({ x, y, min_dist_x, min_dist_y }),
                 });
 
                 const data = await response.json();
@@ -312,10 +328,12 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        x: currentData.x,
-                        y: currentData.y
-                    }),
+                body: JSON.stringify({
+                    x: currentData.x,
+                    y: currentData.y,
+                    min_dist_x: minDistXSlider.value,
+                    min_dist_y: minDistYSlider.value
+                }),
                 });
 
                 const blob = await response.blob();
@@ -448,6 +466,15 @@
                 data.points.length;
             infoBox.style.display = 'block';
         }
+
+        // Add event listeners for sliders
+        minDistXSlider.addEventListener('input', () => {
+            minDistXValue.textContent = minDistXSlider.value;
+        });
+
+        minDistYSlider.addEventListener('input', () => {
+            minDistYValue.textContent = minDistYSlider.value;
+        });
 
         function showError(message) {
             errorMessage.textContent = message;

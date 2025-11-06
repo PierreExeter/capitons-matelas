@@ -5,13 +5,15 @@ from io import StringIO
 app = Flask(__name__)
 
 
-def calculate_points(x, y):
+def calculate_points(x, y, min_dist_x=30, min_dist_y=40):
     """
-    Calculate the positions of points on a 2D rectangle with corner-based pattern.
+    Calculate positions of points on a 2D rectangle with corner-based pattern.
     
     Args:
         x: Width of rectangle in cm
         y: Height of rectangle in cm
+        min_dist_x: Minimum distance between points along x-axis (default 30)
+        min_dist_y: Minimum distance between points along y-axis (default 40)
     
     Returns:
         List of tuples containing (x_coord, y_coord) for each point
@@ -19,8 +21,6 @@ def calculate_points(x, y):
     import math
     
     points = []
-    min_dist_x = 30
-    min_dist_y = 40
     
     # Step 1: Place the 4 corner points
     corner1 = (15, 15)
@@ -108,12 +108,16 @@ def calculate():
         data = request.get_json()
         x = float(data['x'])
         y = float(data['y'])
+        min_dist_x = float(data.get('min_dist_x', 30))
+        min_dist_y = float(data.get('min_dist_y', 40))
         
         # Validate inputs
         if x <= 0 or y <= 0:
             return jsonify({'error': 'All dimensions must be positive'}), 400
+        if min_dist_x <= 0 or min_dist_y <= 0:
+            return jsonify({'error': 'Minimum distances must be positive'}), 400
         
-        points = calculate_points(x, y)
+        points = calculate_points(x, y, min_dist_x, min_dist_y)
         
         return jsonify({
             'points': points,
@@ -131,8 +135,10 @@ def download_csv():
         data = request.get_json()
         x = float(data['x'])
         y = float(data['y'])
+        min_dist_x = float(data.get('min_dist_x', 30))
+        min_dist_y = float(data.get('min_dist_y', 40))
         
-        points = calculate_points(x, y)
+        points = calculate_points(x, y, min_dist_x, min_dist_y)
         
         # Create CSV in memory
         output = StringIO()
